@@ -11,7 +11,7 @@ not part of this project.
 - `Z_ENABLE_ASSEMBLY_X86_64`: Enable building the x86_64 assembly sources.
 - `Z_ENABLE_INSTALL`: Install the zlib binaries on the system.
 - `Z_ENABLE_INSTALL_DEVELOPMENT`: Install the zlib development files on the system.
-- `Z_ENABLE_TESTS`: Build the zlib test suite.
+- `Z_ENABLE_EXAMPLES`: Build the zlib library examples.
 - `Z_ENABLE_SHARED`: Build zlib as a shared library. (eg. `zlib1.dll`)
 - `Z_ENABLE_STATIC`: Build zlib as a static library. (eg. `libzlibstatic.a`)
 

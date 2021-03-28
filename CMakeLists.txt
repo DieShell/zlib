@@ -1,8 +1,8 @@
 ## zlib project
 #
 ## LICENSE
-# This source file is licensed under the ISC license. For the license 
-# text, see the provided LICENSE.txt file.
+# This source file is licensed under the zlib license. For the license 
+# text, see the provided LICENSE.txt file, section 2.
 # 
 cmake_minimum_required(VERSION 3.16)
 
@@ -76,8 +76,8 @@ cmake_dependent_option(Z_ENABLE_INSTALL_DEVELOPMENT
                        "Enable installing zlib development file for the system [Off]" Off
                        Z_ENABLE_INSTALL Off
                        )
-option(Z_ENABLE_TESTS
-       "Enable building the zlib test suite [On]" On
+option(Z_ENABLE_EXAMPLES
+       "Enable building the zlib examples [Off]" Off
        )
 option(Z_ENABLE_SHARED 
        "Enable building the shared zlib library [On]" On
@@ -193,6 +193,17 @@ if (Z_ENABLE_INSTALL_DEVELOPMENT)
             )
 endif ()
 
+## z64 utility interface ##
+add_library(z64 INTERFACE)
+add_library(zlib::z64 ALIAS z64)
+
+target_compile_definitions(z64 INTERFACE _FILE_OFFSET_BITS=64)
+
+if (Z_ENABLE_INSTALL_DEVELOPMENT)
+    install(TARGETS z64
+            EXPORT zlibTargets)
+endif ()
+
 ## static library ##
 if (Z_ENABLE_STATIC)
     add_library(zlibstatic STATIC)
@@ -241,6 +252,13 @@ if (Z_ENABLE_SHARED)
                           # As per the original distribution's CMakeLists.txt file. I have no idea how Cygwin works
                           $<$<NOT:$<BOOL:${CYGWIN}>>:VERSION> $<$<NOT:$<BOOL:${CYGWIN}>>:${ZLIB_VERSION}>
                           )
+endif ()
+
+## Eeampels ####################################################################
+if (Z_ENABLE_EXAMPLES)
+    include(CTest)
+
+    add_subdirectory(examples)
 endif ()
 
 ## Installation ################################################################
