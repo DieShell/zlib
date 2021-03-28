@@ -29,5 +29,5 @@ second header.
 The original sources are properties of Jean-loup Gailly and Mark Adler, and are licensed as
 provided in the _LICENSE.txt_ file, first header.
 
-Files included in the CMake wrapper are: _CMakeLists.txt_, _cmake/zlibConfig.in.cmake_.
+Files included in the CMake wrapper are: _CMakeLists.txt_, _cmake/zlibConfig.in.cmake_, _examples/CMakeLists.txt_.
 All other files are part of the original zlib library.
