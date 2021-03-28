@@ -147,15 +147,15 @@ target_compile_definitions(Z_OBJECTS PRIVATE
 add_library(Z_ASM_X86 INTERFACE)
 if (Z_ENABLE_ASSEMBLY_X86)
     target_sources(Z_ASM_X86 INTERFACE
-                   $<$<C_COMPILER_ID:GNU>:src/asm/match.S>
-                   $<$<C_COMPILER_ID:MSVC>:src/asm/match686.asm>
-                   $<$<C_COMPILER_ID:MSVC>:src/asm/inffas32.asm>
+                   $<$<C_COMPILER_ID:GNU>:${CMAKE_CURRENT_SOURCE_DIR}/src/asm/match.S>
+                   $<$<C_COMPILER_ID:MSVC>:${CMAKE_CURRENT_SOURCE_DIR}/src/asm/match686.asm>
+                   $<$<C_COMPILER_ID:MSVC>:${CMAKE_CURRENT_SOURCE_DIR}/src/asm/inffas32.asm>
                    )
     target_compile_definitions(Z_ASM_X86 INTERFACE 
                                ASMV
                                $<$<C_COMPILER_ID:MSVC>:ASMINF>
                                )
-    if (CMAKE_C_C_COMPILER_ID STREQUAL GNU)
+    if (CMAKE_C_COMPILER_ID STREQUAL GNU)
         set_source_files_properties("src/asm/match.S" PROPERTIES
                                     LANGUAGE C
                                     COMPILE_FLAGS -DNO_UNDERLINE
@@ -167,15 +167,16 @@ endif ()
 add_library(Z_ASM_X86_64 INTERFACE)
 if (Z_ENABLE_ASSEMBLY_X86_64)
     target_sources(Z_ASM_X86_64 INTERFACE
-                   $<$<C_COMPILER_ID:GNU>:src/asm/amd64-match.S>
-                   $<$<C_COMPILER_ID:MSVC>:src/asm/gvmat64.asm>
-                   $<$<C_COMPILER_ID:MSVC>:src/asm/inffasx64.asm>
+                   $<$<C_COMPILER_ID:GNU>:${CMAKE_CURRENT_SOURCE_DIR}/src/asm/amd64-match.S>
+                   $<$<C_COMPILER_ID:MSVC>:${CMAKE_CURRENT_SOURCE_DIR}/src/asm/gvmat64.asm>
+                   $<$<C_COMPILER_ID:MSVC>:${CMAKE_CURRENT_SOURCE_DIR}/src/asm/inffasx64.asm>
+                   $<$<C_COMPILER_ID:MSVC>:${CMAKE_CURRENT_SOURCE_DIR}/src/asm/inffas8664.c>
                    )
-    target_compile_definitions(Z_ASM_X86 INTERFACE 
+    target_compile_definitions(Z_ASM_X86_64 INTERFACE 
                                ASMV
                                $<$<C_COMPILER_ID:MSVC>:ASMINF>
                                )
-    if (CMAKE_C_C_COMPILER_ID STREQUAL GNU)
+    if (CMAKE_C_COMPILER_ID STREQUAL GNU)
         set_source_files_properties("src/asm/amd64-match.S" PROPERTIES
                                     LANGUAGE C
                                     COMPILE_FLAGS -DNO_UNDERLINE
