@@ -19,6 +19,7 @@ cmake_policy(SET CMP0009 NEW) # Do not follow symlinks in GLOB_RECURSE
 
 ## Modules #####################################################################
 include(CMakePackageConfigHelpers)
+include(CMakeDependentOption)
 include(GNUInstallDirs)
 include(CheckPIESupported)
 include(CheckTypeSize)
@@ -69,11 +70,12 @@ option(Z_ENABLE_ASSEMBLY_X86_64
        "Enable building the x86_64 assemlby implementation [Off]" Off
        )
 option(Z_ENABLE_INSTALL 
-       "Enable installing zlib for the system [On]" On
+       "Enable installing zlib runtime for the system [On]" On
        )
-option(Z_ENABLE_INSTALL_DEVELOPMENT
-       "Enable installing zlib development file for the system [Off]" Off
-       )
+cmake_dependent_option(Z_ENABLE_INSTALL_DEVELOPMENT
+                       "Enable installing zlib development file for the system [Off]" Off
+                       Z_ENABLE_INSTALL Off
+                       )
 option(Z_ENABLE_TESTS
        "Enable building the zlib test suite [On]" On
        )
@@ -185,31 +187,89 @@ target_link_libraries(Z_OBJECTS PRIVATE
                       Z_ASM_X86 
                       Z_ASM_X86_64
                       )
-
-if (Z_ENABLE_STATIC)
-    add_library(zlibstatic STATIC)
-    target_link_libraries(zlibstatic Z_OBJECTS)
+if (Z_ENABLE_INSTALL_DEVELOPMENT)
+    install(TARGETS Z_OBJECTS Z_ASM_X86 Z_ASM_X86_64
+            EXPORT zlibTargets
+            )
 endif ()
 
+## static library ##
+if (Z_ENABLE_STATIC)
+    add_library(zlibstatic STATIC)
+    add_library(zlib::zlibstatic ALIAS zlibstatic)
+    target_link_libraries(zlibstatic Z_OBJECTS)
+    if (Z_ENABLE_INSTALL_DEVELOPMENT)
+        install(TARGETS zlibstatic 
+                EXPORT zlibTargets
+                LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+                )
+    endif ()
+endif ()
+
+## shared library ##
 if (Z_ENABLE_SHARED)
     add_library(zlib SHARED
                 $<$<PLATFORM_ID:Windows>:src/zlib.def>
                 $<$<PLATFORM_ID:Windows>:src/res/zlib1.rc>
                 )
+    add_library(zlib::zlib ALIAS zlib)
+    target_link_libraries(zlib Z_OBJECTS)
+    if (Z_ENABLE_INSTALL)
+        install(TARGETS zlib
+                RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
+                )
+    endif ()
+    if (Z_ENABLE_INSTALL_DEVELOPMENT)
+        install(TARGETS zlib
+                EXPORT zlibTargets
+                LIBRARY DESTINATION "${CMAKE_INSTALL_BINDIR}"
+                )
+    endif ()
+    
     set_source_files_properties("src/res/zlib1.rc"
                                 COMPILE_FLAGS $<$<C_COMPILER_ID:GNU>:-DGCC_WINDRES>
                                 )
-    target_link_libraries(zlib Z_OBJECTS)
+
     set(_Z_UNICES_LINK_FLAGS "-Wl,--version-script,\"${CMAKE_CURRENT_SOURCE_DIR}/src/zlib.map\"")
     target_link_options(zlib PUBLIC
                         $<$<AND:$<BOOL:${UNIX}>,$<NOT:$<BOOL:${APPLE}>>>:LINK_FLAGS ${_Z_UNICES_LINK_FLAGS}>
                         )
     set_target_properties(zlib PROPERTIES
                           DEFINE_SYMBOL ZLIB_DLL
-                          SOVERSION 1
-                          $<$<BOOL:${UNIX}>:OUTPUT_NAME z>
-                          $<$<BOOL:${WIN32}>:SUFFIX 1>
+                          SOVERSION     1
+                          OUTPUT_NAME   "z$<$<BOOL:${WIN32}>:lib1>"
                           # As per the original distribution's CMakeLists.txt file. I have no idea how Cygwin works
-                          $<$<NOT:$<BOOL:${CYGWIN}>>:VERSION ${ZLIB_VERSION}>
+                          $<$<NOT:$<BOOL:${CYGWIN}>>:VERSION> $<$<NOT:$<BOOL:${CYGWIN}>>:${ZLIB_VERSION}>
                           )
 endif ()
+
+## Installation ################################################################
+if (Z_ENABLE_INSTALL_DEVELOPMENT)
+    install(EXPORT zlibTargets
+            FILE zlibTargets.cmake
+            NAMESPACE zlib::
+            DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}"
+            )
+
+    configure_package_config_file("cmake/zlibConfig.in.cmake"
+                                  "zlibConfig.cmake"
+                                  INSTALL_DESTINATION
+                                  "${CMAKE_INSTALL_LIBDIR}/${PROJECT_NAME}/cmake"
+                                  PATH_VARS
+                                  CMAKE_INSTALL_INCLUDEDIR
+                                  CMAKE_INSTALL_LIBDIR
+                                  )
+
+    write_basic_package_version_file(zlibConfigVersion.cmake
+                                     VERSION ${ZLIB_VERSION}
+                                     COMPATIBILITY SameMajorVersion
+                                     )
+
+    install(FILES 
+            "${CMAKE_CURRENT_BINARY_DIR}/zlibConfig.cmake"
+            "${CMAKE_CURRENT_BINARY_DIR}/zlibConfigVersion.cmake"
+            DESTINATION
+            "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}"
+            )
+endif ()
+

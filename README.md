@@ -12,7 +12,7 @@ not part of this project.
 - `Z_ENABLE_INSTALL`: Install the zlib binaries on the system.
 - `Z_ENABLE_INSTALL_DEVELOPMENT`: Install the zlib development files on the system.
 - `Z_ENABLE_TESTS`: Build the zlib test suite.
-- `Z_ENABLE_SHARED`: Build zlib as a shared library. (eg. `zlib.dll`)
+- `Z_ENABLE_SHARED`: Build zlib as a shared library. (eg. `zlib1.dll`)
 - `Z_ENABLE_STATIC`: Build zlib as a static library. (eg. `libzlibstatic.a`)
 
 By default both shared and static libraries are built, and at least one must be built by the script 
@@ -20,11 +20,14 @@ or it'll die.
 
 ## Licensing
 
-The sources provided by this project are licensed under the ISC (or OpenBSD) license. For this
-license see the _LICENSE.txt_ file, second header.
+The project as a whole is licensed under the zlib license, however, different files have different 
+copyright owners.
 
-These file are: _CMakeLists.txt_.
+The sources provided by the CMake wrapper are licensed as provided in the _LICENSE.txt_ file, 
+second header.
 
-The original sources are properties of Jean-loup Gailly and Mark Adler, and are licensed under the 
-zlib license. For this license see the _LICENSE.txt_ file, first header.
+The original sources are properties of Jean-loup Gailly and Mark Adler, and are licensed as
+provided in the _LICENSE.txt_ file, first header.
 
+Files included in the CMake wrapper are: _CMakeLists.txt_, _cmake/zlibConfig.in.cmake_.
+All other files are part of the original zlib library.
