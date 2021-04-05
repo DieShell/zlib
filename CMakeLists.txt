@@ -146,7 +146,7 @@ target_compile_definitions(Z_OBJECTS PRIVATE
                            $<$<C_COMPILER_ID:MSVC>:_CRT_NONSTDC_NO_DEPRECATE>
                            )
 set_target_properties(Z_OBJECTS PROPERTIES
-                      POSITION_INDEPENDENT_CODE "${Z_ENABLE_PIE}"
+                      POSITION_INDEPENDENT_CODE "${Z_ENABLE_PIC}"
                       )
 
 # x86 assambly sources
@@ -217,7 +217,7 @@ if (Z_ENABLE_STATIC)
     add_library(zlib::zlibstatic ALIAS zlibstatic)
     target_link_libraries(zlibstatic Z_OBJECTS)
     set_target_properties(zlibstatic PROPERTIES
-                          POSITION_INDEPENDENT_CODE "${Z_ENABLE_PIE}"
+                          POSITION_INDEPENDENT_CODE "${Z_ENABLE_PIC}"
                           )
 
     if (Z_ENABLE_INSTALL_DEVELOPMENT)
@@ -237,7 +237,7 @@ if (Z_ENABLE_SHARED)
     add_library(zlib::zlib ALIAS zlib)
     target_link_libraries(zlib Z_OBJECTS)
     set_target_properties(zlib PROPERTIES
-                          POSITION_INDEPENDENT_CODE "${Z_ENABLE_PIE}"
+                          POSITION_INDEPENDENT_CODE "${Z_ENABLE_PIC}"
                           )
 
     if (Z_ENABLE_INSTALL)
