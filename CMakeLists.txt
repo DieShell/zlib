@@ -85,6 +85,9 @@ option(Z_ENABLE_SHARED
 option(Z_ENABLE_STATIC
       "Enable building the static zlib library [On]" On
        )
+option(Z_ENABLE_PIC
+       "Enable building with Position Independent Code if supported [On]" On
+       )
 
 # Acting on options #
 if (MSVC AND (Z_ENABLE_ASSEMBLY_X86 OR Z_ENABLE_ASSEMBLY_X86_64))
@@ -142,6 +145,9 @@ target_compile_definitions(Z_OBJECTS PRIVATE
                            $<$<C_COMPILER_ID:MSVC>:_CRT_SECURE_NO_DEPRECATE>
                            $<$<C_COMPILER_ID:MSVC>:_CRT_NONSTDC_NO_DEPRECATE>
                            )
+set_target_properties(Z_OBJECTS PROPERTIES
+                      POSITION_INDEPENDENT_CODE "${Z_ENABLE_PIE}"
+                      )
 
 # x86 assambly sources
 add_library(Z_ASM_X86 INTERFACE)
@@ -158,7 +164,7 @@ if (Z_ENABLE_ASSEMBLY_X86)
     if (CMAKE_C_COMPILER_ID STREQUAL GNU)
         set_source_files_properties("src/asm/match.S" PROPERTIES
                                     LANGUAGE C
-                                    COMPILE_FLAGS -DNO_UNDERLINE
+                                    COMPILE_DEFINITIONS NO_UNDERLINE
                                     )
     endif ()
 endif ()
@@ -179,7 +185,7 @@ if (Z_ENABLE_ASSEMBLY_X86_64)
     if (CMAKE_C_COMPILER_ID STREQUAL GNU)
         set_source_files_properties("src/asm/amd64-match.S" PROPERTIES
                                     LANGUAGE C
-                                    COMPILE_FLAGS -DNO_UNDERLINE
+                                    COMPILE_DEFINITIONS NO_UNDERLINE
                                     )
     endif ()
 endif ()
@@ -210,6 +216,10 @@ if (Z_ENABLE_STATIC)
     add_library(zlibstatic STATIC)
     add_library(zlib::zlibstatic ALIAS zlibstatic)
     target_link_libraries(zlibstatic Z_OBJECTS)
+    set_target_properties(zlibstatic PROPERTIES
+                          POSITION_INDEPENDENT_CODE "${Z_ENABLE_PIE}"
+                          )
+
     if (Z_ENABLE_INSTALL_DEVELOPMENT)
         install(TARGETS zlibstatic 
                 EXPORT zlibTargets
@@ -226,6 +236,10 @@ if (Z_ENABLE_SHARED)
                 )
     add_library(zlib::zlib ALIAS zlib)
     target_link_libraries(zlib Z_OBJECTS)
+    set_target_properties(zlib PROPERTIES
+                          POSITION_INDEPENDENT_CODE "${Z_ENABLE_PIE}"
+                          )
+
     if (Z_ENABLE_INSTALL)
         install(TARGETS zlib
                 RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
@@ -255,7 +269,7 @@ if (Z_ENABLE_SHARED)
                           )
 endif ()
 
-## Eeampels ####################################################################
+## Examples ####################################################################
 if (Z_ENABLE_EXAMPLES)
     include(CTest)
 
