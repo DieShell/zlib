@@ -1,9 +1,10 @@
-# zlib
+# z
 
-This is a simple CMake package for the [zlib](https://zlib.net) compression library.
+This is a simple CMake package for the [zlib](https://zlib.net) compression library. Note the project is called `z` in
+order to allow CMake to actually find this version of zlib without interfering with the likely installed system zlib.
 
-Note that the zlib source distribution's _contrib/_ directory is not part of zlib, and is therefore
-not part of this project.
+Note that the zlib source distribution's _contrib/_ directory is not part of zlib, and is therefore not part of this
+project.
 
 ## CMake options
 
@@ -14,20 +15,19 @@ not part of this project.
 - `Z_ENABLE_EXAMPLES`: Build the zlib library examples.
 - `Z_ENABLE_SHARED`: Build zlib as a shared library. (eg. `zlib1.dll`)
 - `Z_ENABLE_STATIC`: Build zlib as a static library. (eg. `libzlibstatic.a`)
+- `Z_OVERRIDE_SYSTEM_PKGCONFIG`: By default if the system has a zlib.pc in prefix/lib/pkgconfig we do not override it,
+  however if this option is set, we ignore if the system is already equipped with zlib
 
-By default both shared and static libraries are built, and at least one must be built by the script 
-or it'll die.
+By default both shared and static libraries are built, and at least one must be built by the script or it'll die.
 
 ## Licensing
 
-The project as a whole is licensed under the zlib license, however, different files have different 
-copyright owners.
+The project as a whole is licensed under the zlib license, however, different files have different copyright owners.
 
-The sources provided by the CMake wrapper are licensed as provided in the _LICENSE.txt_ file, 
-second header.
+The sources provided by the CMake wrapper are licensed as provided in the _LICENSE.txt_ file, second header.
 
-The original sources are properties of Jean-loup Gailly and Mark Adler, and are licensed as
-provided in the _LICENSE.txt_ file, first header.
+The original sources are properties of Jean-loup Gailly and Mark Adler, and are licensed as provided in the
+_LICENSE.txt_ file, first header.
 
-Files included in the CMake wrapper are: _CMakeLists.txt_, _cmake/zlibConfig.in.cmake_, _examples/CMakeLists.txt_.
-All other files are part of the original zlib library.
+Files included in the CMake wrapper are: _CMakeLists.txt_, _cmake/zConfig.in.cmake_, _examples/CMakeLists.txt_. All
+other files are part of the original zlib library.

@@ -1,9 +1,9 @@
 ## zlib project
 #
 ## LICENSE
-# This source file is licensed under the zlib license. For the license 
+# This source file is licensed under the zlib license. For the license
 # text, see the provided LICENSE.txt file, section 2.
-# 
+#
 cmake_minimum_required(VERSION 3.16)
 
 ## CMake system setup ##########################################################
@@ -43,21 +43,21 @@ check_type_size("off64_t" OFF64_T)
 check_function_exists("fseeko" HAVE_FSEEKO)
 
 ## Project #####################################################################
-# Query project version from zlib.h 
+# Query project version from zlib.h
 # -> original idea from official zlib distribution
 file(STRINGS "src/zlib.h" _Z_ZLIB_H_VERSION
      LENGTH_MINIMUM 5 # x.y.z, where x, y, and z are a single digit
      LIMIT_COUNT    1 # we only need one
      REGEX          [[ZLIB_VERSION]] # version macro's name
      )
-string(REGEX REPLACE 
-       [[.*([0-9]+\.[0-9]+\.[0-9]+).*]] [[\1]] 
-       ZLIB_VERSION 
+string(REGEX REPLACE
+       [[.*([0-9]+\.[0-9]+\.[0-9]+).*]] [[\1]]
+       ZLIB_VERSION
        "${_Z_ZLIB_H_VERSION}"
        )
 message(STATUS "Building zlib version ${ZLIB_VERSION}")
 
-project(zlib 
+project(z
         VERSION ${ZLIB_VERSION}
         DESCRIPTION "The zlib compression library"
         LANGUAGES C
@@ -69,7 +69,7 @@ option(Z_ENABLE_ASSEMBLY_X86
 option(Z_ENABLE_ASSEMBLY_X86_64
        "Enable building the x86_64 assemlby implementation [Off]" Off
        )
-option(Z_ENABLE_INSTALL 
+option(Z_ENABLE_INSTALL
        "Enable installing zlib runtime for the system [On]" On
        )
 cmake_dependent_option(Z_ENABLE_INSTALL_DEVELOPMENT
@@ -79,7 +79,7 @@ cmake_dependent_option(Z_ENABLE_INSTALL_DEVELOPMENT
 option(Z_ENABLE_EXAMPLES
        "Enable building the zlib examples [Off]" Off
        )
-option(Z_ENABLE_SHARED 
+option(Z_ENABLE_SHARED
        "Enable building the shared zlib library [On]" On
        )
 option(Z_ENABLE_STATIC
@@ -87,6 +87,9 @@ option(Z_ENABLE_STATIC
        )
 option(Z_ENABLE_PIC
        "Enable building with Position Independent Code if supported [On]" On
+       )
+option(Z_OVERRIDE_SYSTEM_PKGCONFIG
+       "Override an already installed system zlib.pc file [Off]" Off
        )
 
 # Acting on options #
@@ -97,17 +100,17 @@ endif ()
 configure_file("src/zconf.h.cmakein"
                "zconf.h"
                @ONLY
-               ) 
+               )
 
 # Option integrty checks #
 if (NOT (Z_ENABLE_SHARED OR Z_ENABLE_STATIC))
-    message(FATAL_ERROR 
+    message(FATAL_ERROR
             [[
-            zlib: No libraries are specified for builing. 
+            zlib: No libraries are specified for builing.
             Specify at least one from Z_ENABLE_SHARED and Z_ENABLE_STATIC
             as true.
             ]]
-            )    
+            )
 endif ()
 
 ## Targets #####################################################################
@@ -157,7 +160,7 @@ if (Z_ENABLE_ASSEMBLY_X86)
                    $<$<C_COMPILER_ID:MSVC>:${CMAKE_CURRENT_SOURCE_DIR}/src/asm/match686.asm>
                    $<$<C_COMPILER_ID:MSVC>:${CMAKE_CURRENT_SOURCE_DIR}/src/asm/inffas32.asm>
                    )
-    target_compile_definitions(Z_ASM_X86 INTERFACE 
+    target_compile_definitions(Z_ASM_X86 INTERFACE
                                ASMV
                                $<$<C_COMPILER_ID:MSVC>:ASMINF>
                                )
@@ -178,7 +181,7 @@ if (Z_ENABLE_ASSEMBLY_X86_64)
                    $<$<C_COMPILER_ID:MSVC>:${CMAKE_CURRENT_SOURCE_DIR}/src/asm/inffasx64.asm>
                    $<$<C_COMPILER_ID:MSVC>:${CMAKE_CURRENT_SOURCE_DIR}/src/asm/inffas8664.c>
                    )
-    target_compile_definitions(Z_ASM_X86_64 INTERFACE 
+    target_compile_definitions(Z_ASM_X86_64 INTERFACE
                                ASMV
                                $<$<C_COMPILER_ID:MSVC>:ASMINF>
                                )
@@ -190,39 +193,39 @@ if (Z_ENABLE_ASSEMBLY_X86_64)
     endif ()
 endif ()
 
-target_link_libraries(Z_OBJECTS PRIVATE 
-                      Z_ASM_X86 
+target_link_libraries(Z_OBJECTS PRIVATE
+                      Z_ASM_X86
                       Z_ASM_X86_64
                       )
 if (Z_ENABLE_INSTALL_DEVELOPMENT)
     install(TARGETS Z_OBJECTS Z_ASM_X86 Z_ASM_X86_64
-            EXPORT zlibTargets
+            EXPORT zTargets
             )
 endif ()
 
 ## z64 utility interface ##
 add_library(z64 INTERFACE)
-add_library(zlib::z64 ALIAS z64)
+add_library(z::z64 ALIAS z64)
 
 target_compile_definitions(z64 INTERFACE _FILE_OFFSET_BITS=64)
 
 if (Z_ENABLE_INSTALL_DEVELOPMENT)
     install(TARGETS z64
-            EXPORT zlibTargets)
+            EXPORT zTargets)
 endif ()
 
 ## static library ##
 if (Z_ENABLE_STATIC)
     add_library(zlibstatic STATIC)
-    add_library(zlib::zlibstatic ALIAS zlibstatic)
+    add_library(z::zlibstatic ALIAS zlibstatic)
     target_link_libraries(zlibstatic Z_OBJECTS)
     set_target_properties(zlibstatic PROPERTIES
                           POSITION_INDEPENDENT_CODE "${Z_ENABLE_PIC}"
                           )
 
     if (Z_ENABLE_INSTALL_DEVELOPMENT)
-        install(TARGETS zlibstatic 
-                EXPORT zlibTargets
+        install(TARGETS zlibstatic
+                EXPORT zTargets
                 LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
                 )
     endif ()
@@ -234,7 +237,7 @@ if (Z_ENABLE_SHARED)
                 $<$<PLATFORM_ID:Windows>:src/zlib.def>
                 $<$<PLATFORM_ID:Windows>:src/res/zlib1.rc>
                 )
-    add_library(zlib::zlib ALIAS zlib)
+    add_library(z::zlib ALIAS zlib)
     target_link_libraries(zlib Z_OBJECTS)
     set_target_properties(zlib PROPERTIES
                           POSITION_INDEPENDENT_CODE "${Z_ENABLE_PIC}"
@@ -247,11 +250,11 @@ if (Z_ENABLE_SHARED)
     endif ()
     if (Z_ENABLE_INSTALL_DEVELOPMENT)
         install(TARGETS zlib
-                EXPORT zlibTargets
+                EXPORT zTargets
                 LIBRARY DESTINATION "${CMAKE_INSTALL_BINDIR}"
                 )
     endif ()
-    
+
     set_source_files_properties("src/res/zlib1.rc"
                                 COMPILE_FLAGS $<$<C_COMPILER_ID:GNU>:-DGCC_WINDRES>
                                 )
@@ -277,15 +280,23 @@ if (Z_ENABLE_EXAMPLES)
 endif ()
 
 ## Installation ################################################################
+configure_file(zlib.pc.in
+               zlib.pc.cmakein
+               @ONLY
+               )
+file(GENERATE OUTPUT zlib.pc
+     INPUT "${CMAKE_CURRENT_BINARY_DIR}/zlib.pc.cmakein"
+     )
+
 if (Z_ENABLE_INSTALL_DEVELOPMENT)
-    install(EXPORT zlibTargets
-            FILE zlibTargets.cmake
-            NAMESPACE zlib::
+    install(EXPORT zTargets
+            FILE zTargets.cmake
+            NAMESPACE z::
             DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}"
             )
 
-    configure_package_config_file("cmake/zlibConfig.in.cmake"
-                                  "zlibConfig.cmake"
+    configure_package_config_file("cmake/zConfig.in.cmake"
+                                  "zConfig.cmake"
                                   INSTALL_DESTINATION
                                   "${CMAKE_INSTALL_LIBDIR}/${PROJECT_NAME}/cmake"
                                   PATH_VARS
@@ -293,16 +304,24 @@ if (Z_ENABLE_INSTALL_DEVELOPMENT)
                                   CMAKE_INSTALL_LIBDIR
                                   )
 
-    write_basic_package_version_file(zlibConfigVersion.cmake
+    write_basic_package_version_file(zConfigVersion.cmake
                                      VERSION ${ZLIB_VERSION}
                                      COMPATIBILITY SameMajorVersion
                                      )
 
-    install(FILES 
-            "${CMAKE_CURRENT_BINARY_DIR}/zlibConfig.cmake"
-            "${CMAKE_CURRENT_BINARY_DIR}/zlibConfigVersion.cmake"
+    install(FILES
+            "${CMAKE_CURRENT_BINARY_DIR}/zConfig.cmake"
+            "${CMAKE_CURRENT_BINARY_DIR}/zConfigVersion.cmake"
             DESTINATION
             "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}"
             )
+    if (NOT EXISTS "${CMAKE_INSTALL_FULL_LIBDIR}/pkgconfig/zlib.pc"
+        OR Z_OVERRIDE_SYSTEM_PKGCONFIG)
+        install(FILES
+                "${CMAKE_CURRENT_BINARY_DIR}/zlib.pc"
+                DESTINATION
+                "${CMAKE_INSTALL_LIBDIR}/pkgconfig"
+                )
+    endif ()
 endif ()
 
