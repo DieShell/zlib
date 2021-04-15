@@ -9,5 +9,5 @@ Description: zlib compression library
 Version: @ZLIB_VERSION@
 
 Requires:
-Libs: @CMAKE_LIBRARY_PATH_FLAG@${libdir} @CMAKE_LIBRARY_PATH_FLAG@${sharedlibdir} @CMAKE_LINK_LIBRARY_FLAG@$<TARGET_LINKER_FILE_BASE_NAME:zlib>
+Libs: @CMAKE_LIBRARY_PATH_FLAG@${libdir} @CMAKE_LIBRARY_PATH_FLAG@${sharedlibdir} @CMAKE_LINK_LIBRARY_FLAG@$<TARGET_LINKER_FILE_BASE_NAME:z::zlib>
 Cflags: -I${includedir}

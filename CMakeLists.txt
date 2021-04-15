@@ -25,10 +25,13 @@ include(CheckPIESupported)
 include(CheckTypeSize)
 include(CheckFunctionExists)
 include(CheckCSourceCompiles)
+include(CMakePushCheckState)
 
 ## System cabaility checks #####################################################
 # Position independent code #
 check_pie_supported(LANGUAGES C)
+
+cmake_push_check_state(RESET)
 
 # System headers #
 check_include_file("sys/types.h" HAVE_SYS_TYPES_H)
@@ -37,10 +40,16 @@ check_include_file("stddef.h"    HAVE_STDDEF_H)
 check_include_file("unistd.h"    HAVE_UNISTD_H)
 
 # System types
+list(APPEND CMAKE_REQUIRED_DEFINITIONS "_LARGEFILE64_SOURCE=1")
+if (HAVE_UNISTD_H)
+    list(APPEND CMAKE_EXTRA_INCLUDE_FILES "unistd.h")
+endif ()
 check_type_size("off64_t" OFF64_T)
 
 # System functions
 check_function_exists("fseeko" HAVE_FSEEKO)
+
+cmake_pop_check_state()
 
 ## Project #####################################################################
 # Query project version from zlib.h
@@ -298,10 +307,10 @@ if (Z_ENABLE_INSTALL_DEVELOPMENT)
     configure_package_config_file("cmake/zConfig.in.cmake"
                                   "zConfig.cmake"
                                   INSTALL_DESTINATION
-                                  "${CMAKE_INSTALL_LIBDIR}/${PROJECT_NAME}/cmake"
+                                      "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}"
                                   PATH_VARS
-                                  CMAKE_INSTALL_INCLUDEDIR
-                                  CMAKE_INSTALL_LIBDIR
+                                      CMAKE_INSTALL_INCLUDEDIR
+                                      CMAKE_INSTALL_LIBDIR
                                   )
 
     write_basic_package_version_file(zConfigVersion.cmake
