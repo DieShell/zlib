@@ -289,10 +289,11 @@ if (Z_ENABLE_EXAMPLES)
 endif ()
 
 ## Installation ################################################################
-set(Z_HAVE_DYNAMIC "$<NOT:$<STREQUAL:$<TARGET_NAME_IF_EXISTS:z::zlib>,>>")
-set(Z_STATIC_LINK "${CMAKE_LINK_LIBRARY_FLAG}$<TARGET_LINKER_FILE_BASE_NAME:z::zlibstatic>")
-set(Z_DYNAMIC_LINK "${CMAKE_LINK_LIBRARY_FLAG}$<TARGET_LINKER_FILE_BASE_NAME:z::zlib>")
-set(Z_LINK "$<IF:${Z_HAVE_DYNAMIC},${Z_DYNAMIC_LINK},${Z_STATIC_LINK}>")
+if (Z_ENABLE_SHARED)
+    set(Z_LINK "${CMAKE_LINK_LIBRARY_FLAG}$<TARGET_LINKER_FILE_BASE_NAME:z::zlib>")
+else ()
+    set(Z_LINK "${CMAKE_LINK_LIBRARY_FLAG}$<TARGET_LINKER_FILE_BASE_NAME:z::zlibstatic>")
+endif ()
 configure_file(zlib.pc.in
                zlib.pc.cmakein
                @ONLY
