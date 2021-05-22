@@ -158,6 +158,7 @@ target_compile_definitions(Z_OBJECTS PRIVATE
                            $<$<C_COMPILER_ID:MSVC>:_CRT_NONSTDC_NO_DEPRECATE>
                            )
 set_target_properties(Z_OBJECTS PROPERTIES
+                      C_STANDARD 90
                       POSITION_INDEPENDENT_CODE "${Z_ENABLE_PIC}"
                       )
 
