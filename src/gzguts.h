@@ -26,6 +26,10 @@
 #  include <limits.h>
 #endif
 
+#ifdef Z_HAVE_UNISTD_H
+#  include <unistd.h>
+#endif
+
 #ifndef _POSIX_SOURCE
 #  define _POSIX_SOURCE
 #endif
