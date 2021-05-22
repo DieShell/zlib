@@ -159,7 +159,7 @@ target_compile_definitions(Z_OBJECTS PRIVATE
                            )
 if ((CMAKE_C_COMPILER_ID STREQUAL "GNU"
      OR CMAKE_C_COMPILER_ID MATCHES [[Clang]]) AND APPLE)
-    target_compile_options(Z_OBJECTS PRIVATE "-Wno-error" "-Wno-implicit-function-declarations")
+    target_compile_options(Z_OBJECTS PRIVATE "-Wno-error" "-Wno-implicit-function-declaration")
 endif ()
 set_target_properties(Z_OBJECTS PROPERTIES
                       C_STANDARD 90
