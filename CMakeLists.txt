@@ -157,6 +157,10 @@ target_compile_definitions(Z_OBJECTS PRIVATE
                            $<$<C_COMPILER_ID:MSVC>:_CRT_SECURE_NO_DEPRECATE>
                            $<$<C_COMPILER_ID:MSVC>:_CRT_NONSTDC_NO_DEPRECATE>
                            )
+if ((CMAKE_C_COMPILER_ID STREQUAL "GNU"
+     OR CMAKE_C_COMPILER_ID MATCHES [[Clang]]) AND APPLE)
+    target_compile_options(Z_OBJECTS PRIVATE "-Wno-error" "-Wno-implicit-function-declarations")
+endif ()
 set_target_properties(Z_OBJECTS PROPERTIES
                       C_STANDARD 90
                       POSITION_INDEPENDENT_CODE "${Z_ENABLE_PIC}"
